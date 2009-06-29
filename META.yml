@@ -19,12 +19,9 @@ no_index:
     - t
 requires:
   Class::MethodMaker: 0
-  HTML::Table: 0
-  HTML::TreeBuilder: 0
   Math::Cephes::Fraction: 0
   PDL: 0
   Readonly: 0
-  Tie::File::AsHash: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.24
+version: 0.25
