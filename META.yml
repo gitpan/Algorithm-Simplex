@@ -15,13 +15,14 @@ meta-spec:
 name: Algorithm-Simplex
 no_index:
   directory:
+    - examples
     - inc
     - t
 requires:
-  Class::MethodMaker: 0
   Math::Cephes::Fraction: 0
+  Moose: 0
   PDL: 0
-  Readonly: 0
+  namespace::autoclean: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.26
+version: 0.36
