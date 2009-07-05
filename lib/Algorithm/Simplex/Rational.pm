@@ -1,8 +1,17 @@
 package Algorithm::Simplex::Rational;
 use Moose;
+use Algorithm::Simplex::Types;
 use namespace::autoclean;
 extends 'Algorithm::Simplex';
+with 'Algorithm::Simplex::Role::Solve';
 use Math::Cephes::Fraction qw(:fract);
+
+has tableau => (
+    is       => 'rw',
+    isa      => 'FractMatrix',
+    required => 1,
+    coerce   => 1,
+);
 
 
 my $one     = fract( 1, 1 );
@@ -10,7 +19,7 @@ my $neg_one = fract( 1, -1 );
 
 =head1 Name
 
-Algorithm::Simplex::Rational - Rational version of the Simplex Algorithm
+Algorithm::Simplex::Rational - Rational model of the Simplex Algorithm
 
 =head1 Methods
 
@@ -131,23 +140,28 @@ sub is_optimal {
     return $optimal_flag;
 }
 
-sub convert_natural_number_tableau_to_fractional_object_tableau {
+sub current_solution {
     my $self = shift;
 
-# Make each integer and rational entry a fractional object for rational arthimetic
-    for my $i ( 0 .. $self->number_of_rows ) {
-        for my $j ( 0 .. $self->number_of_columns ) {
+    # Report the Current Solution as primal dependents and dual dependents.
+    my @y = @{ $self->y_variables };
+    my @u = @{ $self->u_variables };
 
-            # Check for existing rationals indicated with "/"
-            if ( $self->tableau->[$i]->[$j] =~ m{(\-?\d+)\/(\-?\d+)} ) {
-                $self->tableau->[$i]->[$j] = fract( $1, $2 );
-            }
-            else {
-                $self->tableau->[$i]->[$j] =
-                  fract( $self->tableau->[$i]->[$j], 1 );
-            }
-        }
+    # Dependent Primal Variables
+    my %primal_solution;
+    for my $i ( 0 .. $#y ) {
+        my $rational =  $self->tableau->[$i]->[ $self->number_of_columns ];
+        $primal_solution{ $y[$i]->{generic} } = $rational->as_string;
     }
+
+    # Dependent Dual Variables
+    my %dual_solution;
+    for my $j ( 0 .. $#u ) {
+       my $rational = $self->tableau->[ $self->number_of_rows ]->[$j]->rmul($neg_one);
+       $dual_solution{ $u[$j]->{generic} } = $rational->as_string;
+    }
+    
+    return (\%primal_solution, \%dual_solution);
 }
 
 __PACKAGE__->meta->make_immutable;

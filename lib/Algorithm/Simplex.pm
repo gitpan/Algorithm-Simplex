@@ -3,7 +3,7 @@ use Moose;
 use namespace::autoclean;
 use Data::Dumper;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 has tableau => (
     is       => 'rw',
@@ -154,8 +154,6 @@ sub _build_v_variables {
     }
     return $v_vars;
 }
-
-no Moose;
 
 =head2 get_bland_number_for
 
