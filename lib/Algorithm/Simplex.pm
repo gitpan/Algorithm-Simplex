@@ -3,12 +3,24 @@ use Moose;
 use namespace::autoclean;
 use Data::Dumper;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 has tableau => (
     is       => 'rw',
-    isa      => 'ArrayRef[ArrayRef]',
+    isa      => 'ArrayRef[ArrayRef[Num]]',
     required => 1,
+);
+
+has display_tableau => (
+    is         => 'ro',
+    isa        => 'ArrayRef[ArrayRef[Str]]',
+    lazy_build => 1,
+);
+
+has objective_function_value => (
+    is         => 'ro',
+    isa        => 'Str',
+    lazy_build => 1,
 );
 
 has number_of_rows => (
@@ -23,6 +35,12 @@ has number_of_columns => (
     isa        => 'Int',
     init_arg   => undef,
     lazy_build => 1,
+);
+
+has number_of_pivots_made => (
+    is      => 'rw',
+    isa     => 'Int',
+    default => 0,
 );
 
 has EPSILON => (
@@ -68,23 +86,20 @@ Given a linear program formulated as a Tucker tableau, a 2D matrix or
 ArrayRef[ArrayRef] in Perl, seek an optimal solution.
 
     use Algorithm::Simplex::Rational;
-    use Data::Dumper;
     my $matrix = [
         [ 5,  2,  30],
         [ 3,  4,  20],
         [10,  8,   0],
     ];
-    my $tableau_object = Algorithm::Simplex::Rational->new( tableau => $matrix );
-    $tableau_object->solve;
-    my ($primal_solution, $dual_solution) = $tableau_object->current_solution;
-    print Dumper $primal_solution;
-    print Dumper $dual_solution;
+    my $tableau = Algorithm::Simplex::Rational->new( tableau => $matrix );
+    $tableau->solve;
+    my ($primal_solution, $dual_solution) = $tableau->current_solution;
 
 =head1 Methods
 
 =head2 _build_number_of_rows 
 
-set the number of rows
+Set the number of rows
 
 =cut
 
@@ -96,7 +111,7 @@ sub _build_number_of_rows {
 
 =head2 _build_number_of_columns 
 
-set the number of columns given the tableau matrix
+Set the number of columns given the tableau matrix
 
 =cut
 
@@ -118,7 +133,7 @@ sub _build_x_variables {
     my $x_vars;
     for my $j ( 0 .. $self->number_of_columns - 1 ) {
         my $x_index = $j + 1;
-        $x_vars->[$j]->{'generic'} = 'x' .$x_index;
+        $x_vars->[$j]->{'generic'} = 'x' . $x_index;
     }
     return $x_vars;
 }
@@ -139,7 +154,7 @@ sub _build_u_variables {
 
     my $u_vars;
     for my $j ( 0 .. $self->number_of_columns - 1 ) {
-                my $u_index = $j + 1;
+        my $u_index = $j + 1;
         $u_vars->[$j]->{'generic'} = 'u' . $u_index;
     }
     return $u_vars;
@@ -154,6 +169,17 @@ sub _build_v_variables {
         $v_vars->[$i]->{'generic'} = 'v' . $v_index;
     }
     return $v_vars;
+}
+
+sub _build_display_tableau {
+    my $self = shift;
+    return $self->tableau;
+}
+
+sub _build_objective_function_value {
+    my $self = shift;
+    return $self->display_tableau->[ $self->number_of_rows ]
+      ->[ $self->number_of_columns ] * (-1);
 }
 
 =head2 get_bland_number_for
@@ -239,7 +265,7 @@ sub determine_bland_pivot_row_number {
 
 =head2 min_index
 
-Detemine the index of the element with minimal value.  
+Determine the index of the element with minimal value.  
 Used when finding bland pivots.
 
 =cut
@@ -322,6 +348,16 @@ sub determine_bland_pivot_row_and_column_numbers {
     return ( $pivot_row_number, $pivot_column_number );
 }
 
+# Clear display tableau after pivot so new one can be lazily built.
+# Also increment pivots made counter.
+#after 'pivot' => sub {
+#    warn "After pivot\n";
+#    my $self = shift;
+#    $self->clear_display_tableau;
+#    $self->number_of_pivots_made( $self->number_of_pivots_made + 1 );
+#    return;
+#};
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -386,7 +422,8 @@ PDL
 
 =head1 Variables
 
-We have implicit variable names: x1, x2 ... , y1, y2, ... , u1, u2 ... , v1, v2 ...
+We have implicit variable names: x1, x2 ... , y1, y2, ... , 
+u1, u2 ... , v1, v2 ...
 
 Our variables are represented by:
 

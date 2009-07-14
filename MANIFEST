@@ -1,4 +1,5 @@
 Changes
+examples/modified_Klee-Minty.pl
 examples/solve.pl
 examples/solve_PDL.pl
 inc/Module/Install.pm
