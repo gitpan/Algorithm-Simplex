@@ -24,4 +24,6 @@ META.yml
 README
 script/benchmark_random_LPs.pl
 t/example_LPs.t
+t/pod.t
+t/pod_coverage.t
 t/solve_LPs.t
