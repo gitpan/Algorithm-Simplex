@@ -3,7 +3,7 @@ use Moose;
 use namespace::autoclean;
 use Data::Dumper;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 has tableau => (
     is       => 'rw',
@@ -372,6 +372,10 @@ Strong design influence by George McRae at the University of Montana.
 
 #moose for solid assistance in the refactor: particularly _build_* approach 
 and PDL + Moose namespace management, 'inner'.
+
+=head1 Copyright 
+
+Copyright 2009, Mateu X. Hunter
 
 =head1 License
 

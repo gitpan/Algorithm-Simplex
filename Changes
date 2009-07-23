@@ -1,3 +1,9 @@
+0.41    2009 juliol 22 
+    - Add Copyright Information
+    - Make all test use strict and warnings
+    - Add PDL::Lite to Makefile.PL to make Kwalitee happy
+    - Simplify is_optimal() code
+    
 0.40    2009 juliol 15
     - Document all methods
     - Add pod tests
@@ -7,6 +13,7 @@
     - Use Math::BigRat to help coercing into FractionMatrix
     - Add objective_function_value attribute
     - Add modified Klee-Minty example
+    
 0.38    2009 juliol 11
     - Refine Synopsis
     - Add display_tableau method
@@ -17,18 +24,19 @@
     - Add current_solution() method
     - Add tests and example using solve method
     - Add Solve Role with solve method
-    - Fix benchmark script broken during Moose refactor.
+    - Fix benchmark script broken during Moose refactor
 
 0.36    2009 juliol 3
     - 1st Refactoring pass using Moose
 
 0.26    2009 juny 30
-    - More Documentation.
+    - More Documentation
         
 0.25    2009 juny 29
-    - Improve documentation - mention solve_LP() found in test.
+    - Improve documentation: mention solve_LP() found in test.
     - Remove SimplexView.pm since it doesn't pertain to the model.
-    - Simplify Makefile.PL - remove dependencies for view.
+    - Simplify Makefile.PL: remove dependencies for view.
 
 0.24    2009 juny 28
     - Initial CPAN Release
+

@@ -1,5 +1,5 @@
 ---
-abstract: 'Simplex Algorithm Implementation using Tucker Tableau'
+abstract: 'Simplex Algorithm Implementation using Tucker Tableaux'
 author:
   - 'Mateu X Hunter'
 build_requires:
@@ -23,7 +23,8 @@ requires:
   Math::Cephes::Fraction: 0
   Moose: 0
   PDL: 0
+  PDL::Lite: 0
   namespace::autoclean: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.40
+version: 0.41
