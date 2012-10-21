@@ -1,3 +1,9 @@
+0.42 - 2012-10-21
+    - Convert from Moose to Moo
+    - Convert to Distar
+    - Add more POD
+    - critic and tidy code
+    
 0.41    2009 juliol 22 
     - Add Copyright Information
     - Make all test use strict and warnings

@@ -1,29 +1,18 @@
 Changes
-examples/modified_Klee-Minty.pl
-examples/solve.pl
-examples/solve_PDL.pl
-inc/Module/Install.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Scripts.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/Algorithm/Simplex.pm
 lib/Algorithm/Simplex/Float.pm
 lib/Algorithm/Simplex/PDL.pm
 lib/Algorithm/Simplex/Rational.pm
 lib/Algorithm/Simplex/Role/Solve.pm
 lib/Algorithm/Simplex/Types.pm
-LICENSE
+maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
 META.yml
 README
-script/benchmark_random_LPs.pl
+t/basic_feasible.t
 t/example_LPs.t
 t/pod.t
 t/pod_coverage.t
 t/solve_LPs.t
+META.json                                Module JSON meta-data (added by MakeMaker)

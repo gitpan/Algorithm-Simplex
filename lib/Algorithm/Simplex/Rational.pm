@@ -1,29 +1,29 @@
 package Algorithm::Simplex::Rational;
-use Moose;
+use Moo;
 extends 'Algorithm::Simplex';
 with 'Algorithm::Simplex::Role::Solve';
-use Algorithm::Simplex::Types;
+use MooX::Types::MooseLike::Base qw( InstanceOf ArrayRef Str );
 use Math::Cephes::Fraction qw(:fract);
-use namespace::autoclean;
+use Math::BigRat;
+use namespace::clean;
 
-my $one     = fract( 1, 1 );
-my $neg_one = fract( 1, -1 );
+my $one     = fract(1, 1);
+my $neg_one = fract(1, -1);
 
 has '+tableau' => (
-    isa    => 'FractionMatrix',
-    coerce => 1,
+    isa => ArrayRef [ ArrayRef [ InstanceOf ['Math::Cephes::Fraction'] ] ],
+    coerce => sub { &make_fractions($_[0]) },
 );
 
 has '+display_tableau' => (
-    isa        => 'FractionDisplay',
-    coerce     => 1,
+    isa => ArrayRef [ ArrayRef [Str] ],
+    coerce => sub { &display_fractions($_[0]) },
 );
 
 sub _build_objective_function_value {
     my $self = shift;
-    return $self->tableau
-      ->[$self->number_of_rows]
-      ->[$self->number_of_columns]->rmul($neg_one)->as_string;
+    return $self->tableau->[ $self->number_of_rows ]
+      ->[ $self->number_of_columns ]->rmul($neg_one)->as_string;
 }
 
 =head1 Name
@@ -47,35 +47,34 @@ sub pivot {
 
     # Do tucker algebra on pivot row
     my $scale =
-      $one->rdiv(
-        $self->tableau->[$pivot_row_number]->[$pivot_column_number] );
-    for my $j ( 0 .. $self->number_of_columns ) {
+      $one->rdiv($self->tableau->[$pivot_row_number]->[$pivot_column_number]);
+    for my $j (0 .. $self->number_of_columns) {
         $self->tableau->[$pivot_row_number]->[$j] =
           $self->tableau->[$pivot_row_number]->[$j]->rmul($scale);
     }
     $self->tableau->[$pivot_row_number]->[$pivot_column_number] = $scale;
 
     # Do tucker algebra elsewhere
-    for my $i ( 0 .. $self->number_of_rows ) {
-        if ( $i != $pivot_row_number ) {
+    for my $i (0 .. $self->number_of_rows) {
+        if ($i != $pivot_row_number) {
 
             my $neg_a_ic =
               $self->tableau->[$i]->[$pivot_column_number]->rmul($neg_one);
-            for my $j ( 0 .. $self->number_of_columns ) {
-                $self->tableau->[$i]->[$j] = $self->tableau->[$i]->[$j]->radd(
-                    $neg_a_ic->rmul(
-                        $self->tableau->[$pivot_row_number]->[$j]
-                    )
-                );
+            for my $j (0 .. $self->number_of_columns) {
+                $self->tableau->[$i]->[$j] =
+                  $self->tableau->[$i]->[$j]->radd(
+                    $neg_a_ic->rmul($self->tableau->[$pivot_row_number]->[$j]));
             }
             $self->tableau->[$i]->[$pivot_column_number] =
               $neg_a_ic->rmul($scale);
         }
     }
+
+    return;
 }
 after 'pivot' => sub {
     my $self = shift;
-    $self->number_of_pivots_made( $self->number_of_pivots_made + 1 );
+    $self->number_of_pivots_made($self->number_of_pivots_made + 1);
     return;
 };
 
@@ -94,13 +93,13 @@ sub determine_simplex_pivot_columns {
     my $self = shift;
 
     my @simplex_pivot_column_numbers;
-    for my $col_num ( 0 .. $self->number_of_columns - 1 ) {
+    for my $col_num (0 .. $self->number_of_columns - 1) {
         my $bottom_row_fraction =
           $self->tableau->[ $self->number_of_rows ]->[$col_num];
         my $bottom_row_numeric =
           $bottom_row_fraction->{n} / $bottom_row_fraction->{d};
-        if ( $bottom_row_numeric > 0 ) {
-            push( @simplex_pivot_column_numbers, $col_num );
+        if ($bottom_row_numeric > 0) {
+            push(@simplex_pivot_column_numbers, $col_num);
         }
     }
     return (@simplex_pivot_column_numbers);
@@ -119,18 +118,17 @@ sub determine_positive_ratios {
 
 # Build Ratios and Choose row(s) that yields min for the bland simplex column as a candidate pivot point.
 # To be a Simplex pivot we must not consider negative entries
-    my %pivot_for;
     my @positive_ratios;
     my @positive_ratio_row_numbers;
 
     #print "Column: $possible_pivot_column\n";
-    for my $row_num ( 0 .. $self->number_of_rows - 1 ) {
+    for my $row_num (0 .. $self->number_of_rows - 1) {
         my $bottom_row_fraction =
           $self->tableau->[$row_num]->[$pivot_column_number];
         my $bottom_row_numeric =
           $bottom_row_fraction->{n} / $bottom_row_fraction->{d};
 
-        if ( $bottom_row_numeric > 0 ) {
+        if ($bottom_row_numeric > 0) {
             push(
                 @positive_ratios,
                 (
@@ -148,7 +146,7 @@ sub determine_positive_ratios {
             push @positive_ratio_row_numbers, $row_num;
         }
     }
-    return ( \@positive_ratios, \@positive_ratio_row_numbers );
+    return (\@positive_ratios, \@positive_ratio_row_numbers);
 }
 
 =head2 is_optimal
@@ -163,12 +161,12 @@ would => optimal (while in phase 2).
 sub is_optimal {
     my $self = shift;
 
-    for my $j ( 0 .. $self->number_of_columns - 1 ) {
+    for my $j (0 .. $self->number_of_columns - 1) {
         my $basement_row_fraction =
           $self->tableau->[ $self->number_of_rows ]->[$j];
         my $basement_row_numeric =
           $basement_row_fraction->{n} / $basement_row_fraction->{d};
-        if ( $basement_row_numeric > 0 ) {
+        if ($basement_row_numeric > 0) {
             return 0;
         }
     }
@@ -190,22 +188,63 @@ sub current_solution {
 
     # Dependent Primal Variables
     my %primal_solution;
-    for my $i ( 0 .. $#y ) {
+    for my $i (0 .. $#y) {
         my $rational = $self->tableau->[$i]->[ $self->number_of_columns ];
         $primal_solution{ $y[$i]->{generic} } = $rational->as_string;
     }
 
     # Dependent Dual Variables
     my %dual_solution;
-    for my $j ( 0 .. $#u ) {
+    for my $j (0 .. $#u) {
         my $rational =
           $self->tableau->[ $self->number_of_rows ]->[$j]->rmul($neg_one);
         $dual_solution{ $u[$j]->{generic} } = $rational->as_string;
     }
 
-    return ( \%primal_solution, \%dual_solution );
+    return (\%primal_solution, \%dual_solution);
 }
 
-__PACKAGE__->meta->make_immutable;
+=head2 Coercions
+
+=head3 make_fractions
+
+Make each rational entry a Math::Cephes::Fraction object
+with the help of Math::BigRat
+
+=cut
+
+sub make_fractions {
+    my $tableau = shift;
+
+    for my $i (0 .. scalar @{$tableau} - 1) {
+        for my $j (0 .. scalar @{ $tableau->[0] } - 1) {
+
+            # Using Math::BigRat to make fraction from decimal
+            my $x = Math::BigRat->new($tableau->[$i]->[$j]);
+            $tableau->[$i]->[$j] = fract($x->numerator, $x->denominator);
+        }
+    }
+    return $tableau;
+}
+
+=head3 display_fractions
+
+Convert each fraction object entry into a string.
+
+=cut
+
+sub display_fractions {
+    my $fraction_tableau = shift;
+
+    my $display_tableau;
+    for my $i (0 .. scalar @{$fraction_tableau} - 1) {
+        for my $j (0 .. scalar @{ $fraction_tableau->[0] } - 1) {
+            $display_tableau->[$i]->[$j] =
+              $fraction_tableau->[$i]->[$j]->as_string;
+        }
+    }
+    return $display_tableau;
+
+}
 
 1;
