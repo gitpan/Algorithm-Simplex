@@ -4,7 +4,7 @@ use MooX::Types::MooseLike::Base qw( ArrayRef HashRef Num Int Str );
 use namespace::clean;
 use Carp;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 has tableau => (
     is       => 'rw',
@@ -71,7 +71,7 @@ has v_variables => (
 
 =head1 Name
 
-Algorithm::Simplex - Simplex Algorithm Implementation using Tucker Tableaux'
+Algorithm::Simplex - Simplex Algorithm Implementation using Tucker Tableaux
 
 =head1 Synopsis
 

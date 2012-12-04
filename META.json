@@ -1,5 +1,5 @@
 {
-   "abstract" : "Simplex Algorithm Implementation using Tucker Tableaux'",
+   "abstract" : "Simplex Algorithm Implementation using Tucker Tableaux",
    "author" : [
       "mateu - Mateu X. Hunter (cpan:MATEU) <hunter@missoula.org>"
    ],
@@ -35,6 +35,7 @@
             "Math::BigRat" : "0",
             "Math::Cephes::Fraction" : "0",
             "Moo" : "0",
+            "MooX::Types::MooseLike" : "0.16",
             "PDL" : "0",
             "PDL::Lite" : "0",
             "namespace::clean" : "0"
@@ -50,5 +51,5 @@
          "url" : "git://github.com/mateu/Algorithm-Simplex.git"
       }
    },
-   "version" : "0.42"
+   "version" : "0.43"
 }

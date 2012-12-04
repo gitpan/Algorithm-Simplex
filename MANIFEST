@@ -4,7 +4,6 @@ lib/Algorithm/Simplex/Float.pm
 lib/Algorithm/Simplex/PDL.pm
 lib/Algorithm/Simplex/Rational.pm
 lib/Algorithm/Simplex/Role/Solve.pm
-lib/Algorithm/Simplex/Types.pm
 maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
